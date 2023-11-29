@@ -334,32 +334,45 @@ private:
         }
 
         if (args.size() < 3) {
-            cerr << "Usage: cp <source> <destination>\n";
+            cerr << "Usage: cp [-r] <source> <destination>\n";
             return;
         }
 
-        const string& source = args[1];
-        const string& destination = args[2];
+        bool recursive = false;
+        size_t sourceIndex = 1;
 
-        // Check if the source file exists
-        ifstream sourceFile(source, ios::binary);
-        if (!sourceFile.is_open()) {
-            cerr << "Error: Unable to open source file " << source << endl;
-            return;
+        // Check for recursive option
+        if (args.size() > 3 && args[1] == "-r") {
+            recursive = true;
+            sourceIndex = 2;
         }
 
-        // Check if the destination is a directory
-        struct stat destInfo;
-        if (stat(destination.c_str(), &destInfo) == 0 && S_ISDIR(destInfo.st_mode)) {
-            // If the destination is a directory, append the source file's name to it
-            const string destPath = destination + "/" + getFileName(source);
-            copyFileContents(sourceFile, destPath, args);
+        const string& source = args[sourceIndex];
+        const string& destination = args[sourceIndex + 1];
+
+        if (recursive) {
+            recursiveCopyDirectory(source, destination);
         } else {
-            // If the destination is not a directory, copy the file to the destination
-            copyFileContents(sourceFile, destination, args);
-        }
+            // Check if the source file exists
+            ifstream sourceFile(source, ios::binary);
+            if (!sourceFile.is_open()) {
+                cerr << "Error: Unable to open source file " << source << endl;
+                return;
+            }
 
-        sourceFile.close();
+            // Check if the destination is a directory
+            struct stat destInfo;
+            if (stat(destination.c_str(), &destInfo) == 0 && S_ISDIR(destInfo.st_mode)) {
+                // If the destination is a directory, append the source file's name to it
+                const string destPath = destination + "/" + getFileName(source);
+                copyFileContents(sourceFile, destPath, args);
+            } else {
+                // If the destination is not a directory, copy the file to the destination
+                copyFileContents(sourceFile, destination, args);
+            }
+
+            sourceFile.close();
+        }
     }
 
     void copyFileContents(ifstream& sourceFile, const string& destination, const vector<string>& args) {
@@ -397,6 +410,63 @@ private:
         } else {
             cout << "File not overwritten.\n";
         }
+    }
+
+    void recursiveCopyDirectory(const string& source, const string& destination) {
+        DIR* dir;
+        struct dirent* ent;
+
+        if ((dir = opendir(source.c_str())) != NULL) {
+            if (mkdir(destination.c_str(), 0777) != 0 && errno != EEXIST) {
+                cerr << "Error creating directory " << destination << endl;
+                closedir(dir);
+                return;
+            }
+
+            while ((ent = readdir(dir)) != NULL) {
+                if (string(ent->d_name) != "." && string(ent->d_name) != "..") {
+                    const string fullSourcePath = source + "/" + string(ent->d_name);
+                    const string fullDestPath = destination + "/" + string(ent->d_name);
+
+                    if (isDirectory(fullSourcePath)) {
+                        recursiveCopyDirectory(fullSourcePath, fullDestPath);
+                    } else {
+                        copyFileContents(fullSourcePath, fullDestPath);
+                    }
+                }
+            }
+
+            closedir(dir);
+        } else {
+            cerr << "Error opening directory " << source << endl;
+        }
+    }
+
+    void copyFileContents(const string& source, const string& destination) {
+        ifstream sourceFile(source, ios::binary);
+        ofstream destFile(destination, ios::binary);
+
+        if (!sourceFile.is_open()) {
+            cerr << "Error: Unable to open source file " << source << endl;
+            return;
+        }
+
+        if (!destFile.is_open()) {
+            cerr << "Error: Unable to open destination file " << destination << endl;
+            sourceFile.close();
+            return;
+        }
+
+        // Reset ifstream position before copying
+        sourceFile.clear();
+        sourceFile.seekg(0, ios::beg);
+
+        // Copy file contents
+        destFile << sourceFile.rdbuf();
+        destFile.close();
+        sourceFile.close();
+
+        cout << "File copied successfully\n";
     }
 };
 
