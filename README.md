@@ -16,8 +16,6 @@
     <li><a href="#commands">Commands</a></li>
     <li><a href="#multithreading">Multi-Threading</a></li>
     <li><a href="#examples">Examples</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
 </ul>
 
 <h2 id="usage">Usage</h2>
