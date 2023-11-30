@@ -41,11 +41,3 @@
 
 <p>The script will display whether the compilation was successful, run the C++ program, measure the time taken for
     execution, and clean up the compiled executable.</p>
-
-<h2>Contributing</h2>
-
-<p>Feel free to contribute to this project by submitting issues or pull requests.</p>
-
-</body>
-
-</html>
