@@ -29,5 +29,5 @@ public:
     void moveFileInternal(const string& source, const string& destination, bool recursive);
     void processListDirectoryEntry(const string& path, dirent* entry, bool showHidden, bool longFormat, bool recursive);
     void listDirectoryContentsRecursiveParallel(const string& path, bool showHidden, bool longFormat, bool recursive);
-
+    void listDirectoryContentsWildcard(const string& path, bool showHidden, bool longFormat, bool recursive, const string& wildcardPattern);
 };

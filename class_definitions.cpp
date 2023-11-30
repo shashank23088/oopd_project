@@ -62,8 +62,35 @@ vector<string> Shell::parseCommand(const string& command) {
     istringstream tokenStream(command);
     string token;
 
+    bool isOption = false;
+    bool isWildcardOption = false;
+
+    // Use space as a delimiter and treat multiple spaces as one
     while (tokenStream >> token) {
-        args.push_back(token);
+        if (token.size() > 1 && token[0] == '-') {
+            // If the token starts with '-', consider it an option
+            args.push_back(token);
+            isOption = true;
+            if (token == "-w" || token == "--wildcard") {
+                isWildcardOption = true;
+            }
+        } else {
+            if (isOption) {
+                if (isWildcardOption) {
+                    // If the previous token was a wildcard option, treat the current one as its argument
+                    args.push_back(token);
+                    isOption = false;
+                    isWildcardOption = false;
+                } else {
+                    // If the previous token was an option, treat the current one as a regular argument
+                    args.pop_back();
+                    args.push_back(token);
+                    isOption = false;
+                }
+            } else {
+                args.push_back(token);
+            }
+        }
     }
 
     return args;
@@ -75,7 +102,7 @@ void Shell::showHelp(const string& command) {
         cout << "Usage: cd <directory>\n";
     } else if (command == "ls") {
         cout << "ls - List directory contents.\n";
-        cout << "Usage: ls [-a] [-l] [-r]\n";
+        cout << "Usage: ls [-a] [-l] [-r] [wildcard]\n"; // Include wildcard information
         cout << "Options:\n";
         cout << "  -a, --all                  do not ignore entries starting with .\n";
         cout << "  -l, --long                 show additional information\n";
@@ -120,6 +147,8 @@ void Shell::listDirectoryContents(const vector<string>& args) {
     bool showHidden = false;
     bool longFormat = false;
     bool recursive = false;
+    bool wildcard = false;
+    string wildcardPattern;
 
     // Handle options
     for (size_t i = 1; i < args.size(); ++i) {
@@ -129,6 +158,15 @@ void Shell::listDirectoryContents(const vector<string>& args) {
             longFormat = true;
         } else if (args[i] == "-r") {
             recursive = true;
+        } else if (args[i] == "-w") {
+                wildcard = true;
+                if (i + 1 < args.size()) {
+                    wildcardPattern = args[i + 1];
+                    ++i;  // Skip the next argument as it is the wildcard pattern
+                } else {
+                    cerr << "Usage: ls -w <pattern>" << endl;
+                    return;
+                }
         } else if (args[i] == "-h" || args[i] == "--help") {
             showHelp("ls");
             return;
@@ -138,7 +176,53 @@ void Shell::listDirectoryContents(const vector<string>& args) {
         }
     }
 
-    listDirectoryContentsRecursive(path, showHidden, longFormat, recursive);
+    if (wildcard) {
+        listDirectoryContentsWildcard(path, showHidden, longFormat, recursive, wildcardPattern);
+    } else {
+        listDirectoryContentsRecursive(path, showHidden, longFormat, recursive);
+    }
+}
+
+void Shell::listDirectoryContentsWildcard(const string& path, bool showHidden, bool longFormat, bool recursive, const string& wildcardPattern) {
+    DIR* dir = opendir(path.c_str());
+    if (dir == nullptr) {
+        perror("opendir");
+        return;
+    }
+
+    dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        if (!showHidden && entry->d_name[0] == '.') {
+            continue; // Skip hidden files
+        }
+
+        // Check if the entry matches the wildcard pattern
+        if (fnmatch(wildcardPattern.c_str(), entry->d_name, FNM_PERIOD) == 0) {
+            cout << entry->d_name;
+
+            // Additional information for the '-l' option
+            if (longFormat) {
+                struct stat fileInfo;
+                string fullPath = path + "/" + entry->d_name;
+                if (stat(fullPath.c_str(), &fileInfo) == 0) {
+                    cout << " Size: " << fileInfo.st_size << " bytes";
+                    // Add more information as needed
+                } else {
+                    cerr << " Error getting file information for " << fullPath << endl;
+                }
+            }
+
+            cout << endl;
+
+            // Recursive listing for directories
+            if (recursive && isDirectory(path + "/" + entry->d_name)) {
+                cout << "  Subdirectory: " << entry->d_name << "\n";
+                listDirectoryContentsRecursive(path + "/" + entry->d_name, showHidden, longFormat, recursive);
+            }
+        }
+    }
+
+    closedir(dir);
 }
 
 void Shell::listDirectoryContentsRecursive(const string& path, bool showHidden, bool longFormat, bool recursive) {

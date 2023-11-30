@@ -11,5 +11,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <mutex>
+#include <glob.h>
+#include <cstdlib>
+#include <fnmatch.h>
 
 using namespace std;
