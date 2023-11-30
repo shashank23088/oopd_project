@@ -7,5 +7,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <fstream>
+#include <glob.h> 
+#include <cstdlib>
+#include <fnmatch.h>
 
 using namespace std;

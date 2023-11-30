@@ -20,5 +20,6 @@ private:
     void copyFileContents(ifstream& sourceFile, const string& destination, const vector<string>& args) ;
     void recursiveCopyDirectory(const string& source, const string& destination);
     void copyFileContents(const string& source, const string& destination) ;
+    void listDirectoryContentsWildcard(const string& path, bool showHidden, bool longFormat, bool recursive, const string& wildcardPattern);
     
     };
