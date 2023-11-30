@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<!-- <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C++ Shell Commands</title>
@@ -18,7 +18,7 @@
             font-family: 'Courier New', Courier, monospace;
         }
     </style>
-</head>
+</head> -->
 <body>
 
 <h1>C++ Shell Commands</h1>
@@ -55,21 +55,13 @@ MyShell> cp -r source destination
 
 <p>Compile the program using your preferred C++ compiler. For example:</p>
 <pre>
-g++ -o shell shell.cpp
+g++ -o main main.cpp
 </pre>
 
 <p>Run the compiled executable:</p>
 <pre>
-./shell
+./main
 </pre>
-
-<h2>Contributing</h2>
-
-<p>Feel free to contribute by submitting issues or pull requests. Follow the code of conduct and contribution guidelines.</p>
-
-<h2>License</h2>
-
-<p>This project is licensed under the <a href="LICENSE">MIT License</a>.</p>
 
 </body>
 </html>
