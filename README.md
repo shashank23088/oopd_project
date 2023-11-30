@@ -1,48 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Threaded C++ Shell - README</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-        }
-
-  h1, h2, h3 {
-      color: #333;
-  }
-
-  code {
-      background-color: #f4f4f4;
-      border: 1px solid #ddd;
-      padding: 5px;
-      font-family: "Courier New", Courier, monospace;
-  }
-
-  pre {
-      background-color: #f8f8f8;
-      border: 1px solid #ddd;
-      padding: 10px;
-      overflow: auto;
-  }
-
-  ul {
-      list-style-type: none;
-      padding: 0;
-  }
-
-  ul li::before {
-      content: "▹";
-      margin-right: 10px;
-      color: #777;
-  }
-</style>
-</head>
-
 <body>
 
 <h1>Multi-Threaded C++ Shell</h1>
