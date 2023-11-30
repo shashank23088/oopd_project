@@ -4,6 +4,8 @@
 #include <ctime>
 #include <sys/stat.h>
 
+const long long int MEGABYTE = 1024 * 1024;
+
 int j = 1;
 
 void createDir(const std::string& dirName, int totalFiles) {
@@ -18,7 +20,7 @@ void createDir(const std::string& dirName, int totalFiles) {
             std::cerr << "Error creating file in " << dirName << "/file" << i << ".txt" << std::endl;
             exit(1);
         } else {
-            const int fileSize = 10;
+            const int fileSize = 10 * MEGABYTE;
             char buffer[fileSize] = {}; 
             file.write(buffer, fileSize);
 
