@@ -35,6 +35,7 @@ void createDir(const std::string& dirName, int totalFiles) {
 int main() {
 
     createDir("dir1", 10000);
+    createDir("dir2", 10000);
 
     return 0;
 }
